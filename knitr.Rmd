@@ -1,0 +1,33 @@
+---
+title: "ActivityMonitoring"
+author: "Ann Crawford"
+date: "March 31, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+Read activitydata.csv 
+steps    Number of steps taking in a 5-minute interval (missing values are coded as NA) 
+date    The date on which the measurement was taken in YYYY-MM-DD format 
+interval Identiﬁer for the 5-minute interval in which measurement was taken
+
+
+```{r readdata}
+
+activitydata <-  read.csv("./data/activity.csv")
+activitydata$date <- as.Date(activitydata$date, format="%Y-%m-%d")
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
