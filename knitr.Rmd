@@ -24,13 +24,18 @@ interval Identiﬁer for the 5-minute interval in which measurement was taken
 ```{r readdata}
 
 rm(list = ls())
+##install.packages("stringi")
 
 ##install.packages("ggplot2")
-## install.packages("zoo"")
-library(ggplot2)
+##install.packages("dplyr")
+##install.packages("magrittr")    ## for %>% pipe operator 
+##library(magrittr)
+##library(ggplot2)
+##library(plyr)
 
-activity <-  read.csv("./data/activity.csv")
-activity$date <- as.Date(activity$date, format="%Y-%m-%d")
+activityraw <-  read.csv("./data/activity.csv")
+activity <-activityraw
+activity$date <- as.Date(activityraw$date, format="%Y-%m-%d")
 ```
 
 
@@ -114,17 +119,21 @@ daily number of steps?
 Are there differences in activity patterns
 
 ```{r missingvalues}
-Totalmissing <- sum(is.na(activity$date)) +sum(is.na(activity$interval)) + sum(is.na(activity$steps))
-NoNa <- activity
-NoNa$steps = transform(activity, steps = ifelse(is.na(steps), mean(steps, na.rm=TRUE), steps))
+Totalmissing <- sum(is.na(activityraw$date)) +sum(is.na(activityraw$interval)) + sum(is.na(activityraw$steps))
 
-stepst2<- aggregate(steps ~ date,  data= NoNa, sum)
+
+NoNa$steps = transform(activityraw, steps = ifelse(is.na(steps), mean(steps, na.rm=TRUE), steps))
+
+total2 <- NoNa %>%  group_by(date) %>%
+                    summarize(sum)
+
+
 
 meanstepsPerDay2 <- format(mean(NoNa$steps), scientific = FALSE)
 
 medianstepsPerDay2 <- median(NoNa$steps)
 
-phist2 <- ggplot(data=stepst, aes(NoNa$steps)) + 
+phist2 <- ggplot(data=stepTotal, aes(stepTotal$steps)) + 
   geom_histogram(
                  col="red", 
                  fill="green", 
@@ -134,3 +143,21 @@ phist2 <- ggplot(data=stepst, aes(NoNa$steps)) +
 ```
 
 ##Are there differences in activity patterns between weekdays and weekends?
+
+1. Create a new factor variable in the dataset with two levels – “weekday”
+and “weekend” indicating whether a given date is a weekday or weekend
+day.
+
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the
+5-minute interval (x-axis) and the average number of steps taken, averaged
+across all weekday days or weekend days (y-axis). 
+
+```{ r weekdays }
+
+activity %>% 
+  dayofweek = weekdays(activity$date)
+
+
+
+
+```
