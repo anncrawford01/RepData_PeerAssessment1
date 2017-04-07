@@ -1,15 +1,8 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: "Ann Crawford"
-date: "April 7, 2017"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Ann Crawford  
+April 7, 2017  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 ## Loading and preprocessing the data
 
 
@@ -18,7 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 2. Process/transform the data (if necessary) into a format suitable for your
 analysis, eg make date a date type
 
-```{r readdata}
+
+```r
 ##install.packages("ggplot2")
 ##install.packages("dplyr")
 
@@ -37,14 +31,16 @@ activity$date <- as.Date(activity$date, format="%Y-%m-%d")
 2. Calculate and report the mean and median total number of steps taken
 per day
 
-```{r stepsperday}
+
+```r
 ###stepst<- aggregate(steps ~ date,  data= activity, sum,  na.rm=TRUE)
 stepst <-ddply(activity, c("date"), summarize,  totalsteps = sum(steps,na.rm=TRUE) ) 
 
 meanstepsPerDay   <- mean(stepst$totalsteps, na.rm = TRUE)
 medianstepsPerDay <- median(stepst$totalsteps, na.rm = TRUE)
 ```
-```{r perdayplot}
+
+```r
 ggplot(data=stepst, aes(stepst$totalsteps)) + 
   geom_histogram(bins = 10 ,
                  alpha = .2) + 
@@ -52,9 +48,11 @@ ggplot(data=stepst, aes(stepst$totalsteps)) +
   labs(x="Total", y="Count") 
 ```
 
-**The average steps per day is `r format(meanstepsPerDay, scientific = FALSE)` .**
+![](PA1_template_files/figure-html/perdayplot-1.png)<!-- -->
 
-**The median steps per day is `r medianstepsPerDay`.**
+**The average steps per day is 9354.23 .**
+
+**The median steps per day is 10395.**
 
 
 ## What is the average daily activity pattern?
@@ -65,7 +63,8 @@ and the average number of steps taken, averaged across all days (y-axis)
 2. Which 5-minute interval, on average across all the days in the dataset,
 contains the maximum number of steps?
 
-```{r dailypattern}
+
+```r
 avgint <- aggregate(steps ~ interval,  data= activity, mean,  na.rm=TRUE)
 maxsteps <- subset(avgint,steps == max(avgint$steps) )
 
@@ -75,7 +74,9 @@ maxsteps <- subset(avgint,steps == max(avgint$steps) )
   labs(x="Interval", y="Average Step Count") 
 ```
 
-**The most steps on average are taken in interval `r maxsteps[1,1] `.**
+![](PA1_template_files/figure-html/dailypattern-1.png)<!-- -->
+
+**The most steps on average are taken in interval 835.**
 
 ## Imputing missing values
 
@@ -96,7 +97,8 @@ What is the impact of imputing missing data on the estimates of the total
 daily number of steps?
 Are there differences in activity patterns?
 
-```{r missingvalues}
+
+```r
 Totalmissing <- sum(is.na(activityraw$date)) +sum(is.na(activityraw$interval)) + sum(is.na(activityraw$steps))
 
 NoNa = transform(activity, steps = ifelse(is.na(steps), mean(steps, na.rm=TRUE), steps))
@@ -114,11 +116,13 @@ phist2 <- ggplot(data=Total2, aes(Total2$steps)) +
 phist2
 ```
 
-**Raw data has `r Totalmissing` missing values.**
+![](PA1_template_files/figure-html/missingvalues-1.png)<!-- -->
 
-**The average steps per day after removing NA's is `r meanstepsPerDay2`  .**
+**Raw data has 2304 missing values.**
 
-**The median steps per day is per day after removing NA's `r medianstepsPerDay2` .**
+**The average steps per day after removing NA's is 10766.19  .**
+
+**The median steps per day is per day after removing NA's 10765 .**
 
 **Imputing the missing values changed the mean and median slightly but did not alter the pattern.** 
 
@@ -132,7 +136,8 @@ day.
 5-minute interval (x-axis) and the average number of steps taken, averaged
 across all weekday days or weekend days (y-axis). 
 
-```{r weekdays}
+
+```r
 NoNa$WEorWD = ifelse( weekdays(NoNa$date) == "Saturday"  | weekdays(NoNa$date) == "Sunday" , "Weekend", "WeekDay")
 
 avgwd <-ddply(NoNa, c("interval", "WEorWD"), summarize,  meanst = mean(steps,na.rm=TRUE) ) 
@@ -142,5 +147,7 @@ qplot( interval,meanst, data = avgwd, geom = "line",
   xlab="Interval", ylab="Average Step Count" ,
   facets =  .~WEorWD )
 ```
+
+![](PA1_template_files/figure-html/weekdays-1.png)<!-- -->
 
 **Most steps are taken in during the weekdays in the early hours.  Weekends see later and less steps.**
